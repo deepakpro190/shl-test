@@ -1,5 +1,5 @@
 # Web scraping
-playwright==1.43.0
+playwright
 
 # Data manipulation
 numpy==1.26.4
