@@ -1,5 +1,6 @@
 import streamlit as st
-from utils.faiss_utils import init_faiss, store_results_to_faiss, query_faiss
+from utils.faiss_utils import store_results_to_faiss, query_faiss
+
 from agents.query_analysis import analyze_query_with_mistral
 from utils.response_generator import generate_response
 import os
