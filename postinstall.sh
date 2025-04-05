@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "▶ Installing Playwright Browsers..."
-playwright install
+echo "⚙️ Installing Playwright browsers..."
+playwright install chromium
