@@ -1,6 +1,6 @@
 import requests
 import re
-import streamlit
+import streamlit as st
 def analyze_query_with_mistral(query):
     MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
