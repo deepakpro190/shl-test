@@ -10,6 +10,7 @@ scikit-learn==1.4.2
 
 # FAISS for fast similarity search (CPU version)
 faiss-cpu==1.7.4
+transformers==4.35.2
 
 # Web apps / dashboarding
 streamlit==1.33.0
