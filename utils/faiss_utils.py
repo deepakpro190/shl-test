@@ -23,7 +23,7 @@ def store_results_to_faiss():
 
 def query_faiss(query, k=5):
     # Step 1: Convert query to vector
-    query_vector = embedder.encode([query]).astype('float32')
+    query_vector = model.encode([query]).astype('float32')
     
     # Step 2: Perform search
     D, I = index.search(query_vector, k)
