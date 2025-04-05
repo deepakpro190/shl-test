@@ -21,15 +21,20 @@ def store_results_to_faiss():
             faiss_index.add(embedding)
             stored_texts.append((text, row.get("Link", "#")))
 
-def query_faiss(query, top_k=10):
-    query_embedding = model.encode([query])
-    D, I = faiss_index.search(query_embedding, top_k)
+def query_faiss(query, k=5):
+    # Step 1: Convert query to vector
+    query_vector = embedder.encode([query]).astype('float32')
+    
+    # Step 2: Perform search
+    D, I = index.search(query_vector, k)
+
     results = []
     for idx in I[0]:
-        if idx < len(stored_texts):
+        if 0 <= idx < len(stored_texts):
             text, link = stored_texts[idx]
             results.append((text, link))
     return results
+
 
 def init_faiss():
     faiss_index.reset()
