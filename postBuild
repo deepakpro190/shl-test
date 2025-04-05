@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Install Playwright browsers and dependencies
+echo "Installing Playwright dependencies and Chromium..."
+playwright install chromium
