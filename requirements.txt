@@ -1,0 +1,20 @@
+# Web scraping
+playwright==1.43.0
+
+# Data manipulation
+numpy==1.26.4
+pandas==2.2.2
+
+# Machine learning
+scikit-learn==1.4.2
+
+# FAISS for fast similarity search (CPU version)
+faiss-cpu==1.7.4
+
+# Web apps / dashboarding
+streamlit==1.33.0
+
+# Visualization
+matplotlib==3.8.4
+seaborn==0.13.2
+plotly==5.20.0
