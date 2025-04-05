@@ -4,6 +4,11 @@ from utils.faiss_utils import store_results_to_faiss, query_faiss
 from agents.query_analysis import analyze_query_with_mistral
 from utils.response_generator import generate_response
 import os
+import subprocess
+
+# Install Playwright browser if not already installed
+if not os.path.exists(os.path.expanduser("~/.cache/ms-playwright")):
+    subprocess.run(["playwright", "install", "chromium"], check=True)
 
 MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
