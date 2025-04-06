@@ -104,81 +104,82 @@ def home():
     return render_template("index.html", response=response, user_query=user_query)
 '''
 from flask import Flask, request, render_template, jsonify
-import asyncio
-from playwright.sync_api import sync_playwright
-from playwright.__main__ import main as playwright_main
 import os
+import subprocess
+import traceback
 import requests
+from faiss_utils import store_results_to_faiss, query_faiss
+from response_generator import generate_response
 
-# Install Playwright browsers if not already installed
+# Optional: Install Playwright browsers only if needed
 if not os.path.exists("/opt/render/.cache/ms-playwright"):
     print("⏬ Installing Playwright browsers...")
-    try:
-         # With this simpler and more reliable command:
-        os.system("playwright install chromium")
-    except Exception as e:
-        print("❌ Playwright install failed:", e)
+    os.system("playwright install chromium")
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
+
 @app.route("/process_query", methods=["POST"])
 def process_query():
     try:
         user_query = request.form.get("user_query", "").strip()
         print(f"Received query: {user_query}")
-        
-        # Add back query analysis
-        try:
-            from agents.query_analysis import analyze_query_with_mistral
-            analysis = analyze_query_with_mistral(user_query)
-            
-            # Add back script execution
-            import subprocess
-            
-            # Run first script if keywords exist
-            if analysis.get("keywords"):
-                print(f"Running first.py with keywords: {analysis['keywords']}")
-                subprocess.run(["python", "scripts/first.py", *analysis["keywords"]], 
-                              check=False, timeout=60)
-            
-           
-            if any([analysis["job_family"], analysis["job_level"], analysis["industry"], analysis["language"]]):
-                    print(" Running second.py with job details...")
-                    subprocess.run([
-                        "python", "scripts/second.py",
-                        "--family", analysis["job_family"],
-                        "--level", analysis["job_level"],
-                        "--industry", analysis["industry"],
-                        "--language", analysis["language"]
-                    ], check=True)
 
-            if analysis["job_category"]:
-                    print(" Running third.py with category...")
-                    subprocess.run([
-                        "python", "scripts/third.py",
-                        "--category", analysis["job_category"]
-                    ], check=True)
-                
-             print(" Storing results to FAISS...")
-             store_results_to_faiss()
+        # Step 1: Analyze query using Mistral
+        from agents.query_analysis import analyze_query_with_mistral
+        analysis = analyze_query_with_mistral(user_query)
 
-             print(" Querying FAISS...")
-             results = query_faiss(user_query)
-             print(f" FAISS Results: {results}")
+        # Step 2: Run first.py if keywords are found
+        if analysis.get("keywords"):
+            print(f"Running first.py with keywords: {analysis['keywords']}")
+            subprocess.run(
+                ["python", "scripts/first.py", *analysis["keywords"]],
+                check=False,
+                timeout=60
+            )
 
-             print(" Generating final response...")
-             response = generate_response(user_query, results)
-             print(" Response generated.")
-        
-        
+        # Step 3: Run second.py if job details are available
+        if any([analysis.get("job_family"), analysis.get("job_level"), analysis.get("industry"), analysis.get("language")]):
+            print("Running second.py with job details...")
+            subprocess.run([
+                "python", "scripts/second.py",
+                "--family", analysis.get("job_family", ""),
+                "--level", analysis.get("job_level", ""),
+                "--industry", analysis.get("industry", ""),
+                "--language", analysis.get("language", "")
+            ], check=True)
+
+        # Step 4: Run third.py if job category is available
+        if analysis.get("job_category"):
+            print("Running third.py with category...")
+            subprocess.run([
+                "python", "scripts/third.py",
+                "--category", analysis["job_category"]
+            ], check=True)
+
+        # Step 5: Index results into FAISS
+        print("Storing results to FAISS...")
+        store_results_to_faiss()
+
+        # Step 6: Query FAISS for top matches
+        print("Querying FAISS...")
+        results = query_faiss(user_query)
+        print(f"FAISS Results: {results}")
+
+        # Step 7: Generate final response using Mistral
+        print("Generating final response...")
+        response = generate_response(user_query, results)
+        print("Response generated.")
+
+        return jsonify({"success": True, "response": response})
+
     except Exception as e:
-        import traceback
         print(f"Error: {str(e)}")
         print(traceback.format_exc())
         return jsonify({
-            "success": False, 
+            "success": False,
             "response": f"Error: {str(e)}"
         })
