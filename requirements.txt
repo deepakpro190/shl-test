@@ -11,6 +11,7 @@ scikit-learn==1.4.2
 
 # FAISS for fast similarity search (CPU version)
 faiss-cpu
+playwright
 
 # Transformers & sentence embeddings
 transformers==4.35.2
