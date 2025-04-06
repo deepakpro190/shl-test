@@ -138,16 +138,10 @@ else:
 '''
 import argparse
 import csv
-import time
 import os
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-import requests
+import asyncio
+from playwright.async_api import async_playwright
+
 # ✅ Parse CLI arguments
 parser = argparse.ArgumentParser(description="SHL Crawler - Keyword Search")
 parser.add_argument("keywords", nargs="+", help="List of keywords to search (e.g., manager engineer analyst)")
@@ -156,77 +150,68 @@ args = parser.parse_args()
 # ✅ Ensure output directory exists
 os.makedirs("data", exist_ok=True)
 
-all_jobs = []
+async def main():
+    all_jobs = []
 
-# ✅ Setup Selenium
-chrome_options = Options()
-chrome_options.binary_location = "/usr/bin/chromium"
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context()
+        page = await context.new_page()
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        for keyword in args.keywords:
+            print(f"🔍 Searching for: {keyword}")
+            await page.goto("https://www.shl.com/solutions/products/product-catalog/", timeout=60000)
 
-for keyword in args.keywords:
-    print(f"🔍 Searching for: {keyword}")
-    driver.get("https://www.shl.com/solutions/products/product-catalog/")
-    time.sleep(2)
-
-    try:
-        search_input = WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.NAME, "keyword"))
-        )
-        search_input.clear()
-        search_input.send_keys(keyword)
-
-        search_button = driver.find_element(By.ID, "Form_FilteringFormKeywords_action_doFilteringForm")
-        search_button.click()
-
-        time.sleep(2)
-        WebDriverWait(driver, 5).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.js-target-table-wrapper table tbody tr'))
-        )
-
-        rows = driver.find_elements(By.CSS_SELECTOR, 'table tbody tr')
-
-        for row in rows:
             try:
-                title_el = row.find_element(By.CSS_SELECTOR, 'td a')
-                title = title_el.text.strip()
-                link = title_el.get_attribute('href')
-            except:
-                title, link = '', ''
+                # Fill in the search input
+                await page.fill('input[name="keyword"]', keyword)
+                await page.click('#Form_FilteringFormKeywords_action_doFilteringForm')
+                await page.wait_for_selector("table tbody tr", timeout=10000)
 
-            cells = row.find_elements(By.CSS_SELECTOR, 'td')
-            remote_td = cells[1] if len(cells) > 1 else None
-            adaptive_td = cells[2] if len(cells) > 2 else None
+                rows = await page.query_selector_all("table tbody tr")
 
-            remote = 'Yes' if remote_td and remote_td.find_elements(By.CSS_SELECTOR, 'span.catalogue__circle.-yes') else 'No'
-            adaptive = 'Yes' if adaptive_td and adaptive_td.find_elements(By.CSS_SELECTOR, 'span.catalogue__circle.-yes') else 'No'
+                for row in rows:
+                    title_el = await row.query_selector("td a")
+                    title = await title_el.inner_text() if title_el else ""
+                    link = await title_el.get_attribute("href") if title_el else ""
 
-            key_spans = row.find_elements(By.CSS_SELECTOR, 'span.product-catalogue__key')
-            keys = ', '.join([span.text.strip() for span in key_spans])
+                    tds = await row.query_selector_all("td")
+                    remote = adaptive = "No"
 
-            all_jobs.append({
-                'Job Title': title,
-                'Link': link,
-                'Remote Testing': remote,
-                'Adaptive/IRT': adaptive,
-                'Keys': keys
-            })
+                    if len(tds) > 1:
+                        remote_yes = await tds[1].query_selector("span.catalogue__circle.-yes")
+                        remote = "Yes" if remote_yes else "No"
 
-    except Exception as e:
-        print(f"⚠️ Error retrieving data for keyword '{keyword}': {str(e)}")
+                    if len(tds) > 2:
+                        adaptive_yes = await tds[2].query_selector("span.catalogue__circle.-yes")
+                        adaptive = "Yes" if adaptive_yes else "No"
 
-driver.quit()
+                    key_spans = await row.query_selector_all("span.product-catalogue__key")
+                    keys = ", ".join([await span.inner_text() for span in key_spans])
 
-# ✅ Write results to file
-if all_jobs:
-    output_file = "data/first.csv"
-    with open(output_file, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=['Job Title', 'Link', 'Remote Testing', 'Adaptive/IRT', 'Keys'])
-        writer.writeheader()
-        writer.writerows(all_jobs)
-    print(f"✅ Saved {len(all_jobs)} results to {output_file}")
-else:
-    print("❌ No results found.")
+                    all_jobs.append({
+                        'Job Title': title,
+                        'Link': link,
+                        'Remote Testing': remote,
+                        'Adaptive/IRT': adaptive,
+                        'Keys': keys
+                    })
+
+            except Exception as e:
+                print(f"⚠️ Error retrieving data for keyword '{keyword}': {str(e)}")
+
+        await browser.close()
+
+    # ✅ Write results to file
+    if all_jobs:
+        output_file = "data/first.csv"
+        with open(output_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=['Job Title', 'Link', 'Remote Testing', 'Adaptive/IRT', 'Keys'])
+            writer.writeheader()
+            writer.writerows(all_jobs)
+        print(f"✅ Saved {len(all_jobs)} results to {output_file}")
+    else:
+        print("❌ No results found.")
+
+# ✅ Run the script
+asyncio.run(main())
