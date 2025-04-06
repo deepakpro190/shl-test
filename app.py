@@ -54,6 +54,8 @@ def home():
         except Exception as e:
             print(" An error occurred:", e)
             response = "Oops! Something went wrong. Please try again."
+        else:
+            print("SOMETHING HAPPENDED , DONT KNOW")
 
     return render_template("index.html", response=response, user_query=user_query)
 
