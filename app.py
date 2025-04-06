@@ -84,30 +84,45 @@ def home():
     response = None
 
     if request.method == "POST":
-        user_query = request.form.get("user_query", "").strip()
+        try:
+            print(" Received POST request")
+            user_query = request.form.get("user_query", "").strip()
+            print(f" User query: {user_query}")
 
-        if user_query:
-            # Step 1: Analyze query
-            analysis = analyze_query_with_mistral(user_query)
+            if user_query:
+                print(" Analyzing query...")
+                analysis = analyze_query_with_mistral(user_query)
+                print(f" Analysis result: {analysis}")
 
-            # Step 2: Run scripts based on analysis
-            if analysis["keywords"]:
-                os.system(f"python scripts/first.py {' '.join(analysis['keywords'])}")
+                if analysis["keywords"]:
+                    print(f" Running first.py with keywords: {analysis['keywords']}")
+                    os.system(f"python scripts/first.py {' '.join(analysis['keywords'])}")
 
-            if any([analysis["job_family"], analysis["job_level"], analysis["industry"], analysis["language"]]):
-                os.system(f"python scripts/second.py --family '{analysis['job_family']}' --level '{analysis['job_level']}' --industry '{analysis['industry']}' --language '{analysis['language']}'")
+                if any([analysis["job_family"], analysis["job_level"], analysis["industry"], analysis["language"]]):
+                    print(" Running second.py with job details...")
+                    os.system(f"python scripts/second.py --family '{analysis['job_family']}' --level '{analysis['job_level']}' --industry '{analysis['industry']}' --language '{analysis['language']}'")
 
-            if analysis["job_category"]:
-                os.system(f"python scripts/third.py --category '{analysis['job_category']}'")
+                if analysis["job_category"]:
+                    print(" Running third.py with category...")
+                    os.system(f"python scripts/third.py --category '{analysis['job_category']}'")
 
-            # Step 3: Store and query FAISS
-            store_results_to_faiss()
-            results = query_faiss(user_query)
+                print(" Storing results to FAISS...")
+                store_results_to_faiss()
 
-            # Step 4: Generate response
-            response = generate_response(user_query, results)
+                print(" Querying FAISS...")
+                results = query_faiss(user_query)
+                print(f" FAISS Results: {results}")
+
+                print(" Generating final response...")
+                response = generate_response(user_query, results)
+                print(" Response generated.")
+
+        except Exception as e:
+            print(" An error occurred:", e)
+            response = "Oops! Something went wrong. Please try again."
 
     return render_template("index.html", response=response)
+
 '''
 from flask import Flask,render_template,request
 
