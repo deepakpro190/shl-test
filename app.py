@@ -248,5 +248,3 @@ def process_query():
             "response": "An error occurred while processing your request."
         })
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
