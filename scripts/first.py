@@ -147,7 +147,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-
+import requests
 # ✅ Parse CLI arguments
 parser = argparse.ArgumentParser(description="SHL Crawler - Keyword Search")
 parser.add_argument("keywords", nargs="+", help="List of keywords to search (e.g., manager engineer analyst)")
@@ -160,6 +160,7 @@ all_jobs = []
 
 # ✅ Setup Selenium
 chrome_options = Options()
+chrome_options.binary_location = "/usr/bin/chromium"
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
