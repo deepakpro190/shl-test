@@ -123,7 +123,8 @@ def home():
             response = "Oops! Something went wrong. Please try again."
 
     return render_template("index.html", response=response, user_query=user_query)'''
-    return "<h1>It works!</h1>"
+    print("Rendering with template...")
+    return render_template("index.html", response=None, user_query="")
 
 '''
 from flask import Flask,render_template,request
