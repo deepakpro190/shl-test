@@ -120,5 +120,3 @@ def home():
             session.modified = True
 
     return render_template("index.html", chat_history=session["chat_history"])
-if __name__ == "__main__":
-    app.run(debug=config.DEBUG)
