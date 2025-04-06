@@ -1,7 +1,7 @@
 import requests
 import re
 import os
-import streamlit as st
+
 def analyze_query_with_mistral(query):
     # Assuming MISTRAL_API_KEY is in env vars or a .env file
     MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
