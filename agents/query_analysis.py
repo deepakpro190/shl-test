@@ -2,7 +2,8 @@ import requests
 import re
 import streamlit as st
 def analyze_query_with_mistral(query):
-    MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
+    # Assuming MISTRAL_API_KEY is in env vars or a .env file
+    MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
     system_prompt = """
 You are an assistant that extracts job-related attributes from user queries to choose which script to run.
