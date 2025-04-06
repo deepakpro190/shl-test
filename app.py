@@ -1,4 +1,4 @@
-import streamlit as st
+'''import streamlit as st
 from utils.faiss_utils import store_results_to_faiss, query_faiss
 
 from agents.query_analysis import analyze_query_with_mistral
@@ -64,3 +64,64 @@ if st.button("🚀 Submit Query"):
 
         st.write(response)
         st.session_state.user_query = ""
+'''
+from flask import Flask, request, render_template, session, redirect, url_for
+from utils.faiss_utils import store_results_to_faiss, query_faiss
+from agents.query_analysis import analyze_query_with_mistral
+from utils.response_generator import generate_response
+import subprocess
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+# Setup Playwright (only once, ideally during deployment/setup)
+subprocess.call("playwright install", shell=True)
+subprocess.call("playwright install-deps", shell=True)
+
+app = Flask(__name__)
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
+# Assuming MISTRAL_API_KEY is in env vars or a .env file
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if "chat_history" not in session:
+        session["chat_history"] = []
+
+    if request.method == "POST":
+        user_query = request.form.get("user_query", "").strip()
+
+        if user_query:
+            # Step 1: Analyze query
+            analysis = analyze_query_with_mistral(user_query)
+
+            # Step 2: Run scripts
+            if analysis["keywords"]:
+                os.system(f"python scripts/first.py {' '.join(analysis['keywords'])}")
+
+            if any([analysis["job_family"], analysis["job_level"], analysis["industry"], analysis["language"]]):
+                os.system(f"python scripts/second.py --family '{analysis['job_family']}' --level '{analysis['job_level']}' --industry '{analysis['industry']}' --language '{analysis['language']}'")
+
+            if analysis["job_category"]:
+                os.system(f"python scripts/third.py --category '{analysis['job_category']}'")
+
+            # Step 3: Store results to FAISS
+            store_results_to_faiss()
+
+            # Step 4: Query FAISS
+            results = query_faiss(user_query)
+
+            # Step 5: Generate response
+            response = generate_response(user_query, results)
+
+            # Update session chat
+            session["chat_history"].append({"user": user_query, "bot": response})
+            session.modified = True
+
+    return render_template("index.html", chat_history=session["chat_history"])
+
+if __name__ == "__main__":
+    app.run(debug=True)
