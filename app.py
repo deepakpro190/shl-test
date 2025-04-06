@@ -101,6 +101,13 @@ def home():
 
     return render_template("index.html", response=response, user_query=user_query)
 '''
+from flask import Flask, request, render_template, jsonify
+
+app = Flask(__name__)
+
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("index.html")
 @app.route("/process_query", methods=["POST"])
 def process_query():
     try:
