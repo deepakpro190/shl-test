@@ -1,8 +1,8 @@
 import requests
-import streamlit as st
 
+import os
 def generate_response(user_query, results):
-    MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
+    MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
     if not results:
         return "❌ No relevant assessments found."
