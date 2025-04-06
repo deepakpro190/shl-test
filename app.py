@@ -101,32 +101,34 @@ def home():
 
     return render_template("index.html", response=response, user_query=user_query)
 '''
-from flask import Flask, request, render_template, jsonify
-
-app = Flask(__name__)
-
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("index.html")
-
 @app.route("/process_query", methods=["POST"])
 def process_query():
     try:
         user_query = request.form.get("user_query", "").strip()
         print(f"Received query: {user_query}")
         
-        # Add back just the query analysis
+        # Add back query analysis
         try:
             from agents.query_analysis import analyze_query_with_mistral
             analysis = analyze_query_with_mistral(user_query)
+            
+            # Add back script execution
+            import subprocess
+            
+            # Run first script if keywords exist
+            if analysis.get("keywords"):
+                print(f"Running first.py with keywords: {analysis['keywords']}")
+                subprocess.run(["python", "scripts/first.py", *analysis["keywords"]], 
+                              check=False, timeout=60)
+            
             return jsonify({
                 "success": True,
-                "response": f"Analysis complete: {analysis}"
+                "response": f"Analysis and first script complete"
             })
         except Exception as e:
             return jsonify({
                 "success": False,
-                "response": f"Analysis failed: {str(e)}"
+                "response": f"Processing failed: {str(e)}"
             })
         
     except Exception as e:
