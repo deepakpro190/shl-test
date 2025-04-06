@@ -83,6 +83,7 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 def home():
     response = None
     user_query=""
+    print("HELOO WORLD")
     if request.method == "POST":
         try:
             print(" Received POST request")
