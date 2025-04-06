@@ -84,6 +84,9 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @app.route("/", methods=["GET", "POST"])
+def run():
+    return render_template('index.html')
+
 def home():
     if "chat_history" not in session:
         session["chat_history"] = []
