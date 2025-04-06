@@ -113,7 +113,7 @@ import os
 if not os.path.exists("/opt/render/.cache/ms-playwright"):
     print("⏬ Installing Playwright browsers...")
     try:
-        asyncio.run(playwright_main(["install", "--with-deps"]))
+         os.system("playwright install --with-deps")
     except Exception as e:
         print("❌ Playwright install failed:", e)
 
