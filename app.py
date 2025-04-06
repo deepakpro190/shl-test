@@ -161,15 +161,18 @@ def process_query():
                         "python", "scripts/third.py",
                         "--category", analysis["job_category"]
                     ], check=True)
-            return jsonify({
-                    "success": True,
-                    "response": f"Analysis and all script complete"
-                })
-        except Exception as e:
-            return jsonify({
-                "success": False,
-                "response": f"Processing failed: {str(e)}"
-            })
+                
+             print(" Storing results to FAISS...")
+             store_results_to_faiss()
+
+             print(" Querying FAISS...")
+             results = query_faiss(user_query)
+             print(f" FAISS Results: {results}")
+
+             print(" Generating final response...")
+             response = generate_response(user_query, results)
+             print(" Response generated.")
+        
         
     except Exception as e:
         import traceback
