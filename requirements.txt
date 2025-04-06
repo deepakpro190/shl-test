@@ -18,8 +18,11 @@ sentence_transformers
 accelerate  # optional, remove if unused
 
 # Web app (Flask)
-flask
-gunicorn
+
+Flask==3.0.3
+gunicorn==23.0.0
+
+
 python-dotenv
 
 # Visualization (optional — keep only if you're using them in backend)
