@@ -1,66 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SHL Assessment Recommender</title>
+    <title>Simple Test</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; }
-        .chat-box { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .user, .bot { margin-bottom: 15px; padding: 10px; border-radius: 8px; }
-        .user { color: #2c3e50; background-color: #f0f8ff; }
-        .bot { color: #2c3e50; background-color: #f5f5f5; }
-        .error { color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
-        input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        .loading { display: none; margin-top: 15px; }
-        #responseArea { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; padding: 20px; }
     </style>
 </head>
 <body>
-    <div class="chat-box">
-        <h2>SHL Assessment Recommender</h2>
-        
-        <div id="queryForm">
-            <input type="text" id="user_query" placeholder="Enter a job description or query:" style="width: 80%;" required value="{{ user_query }}" />
-            <button type="button" id="submitBtn" onclick="submitQuery()">Submit</button>
-            <div id="loading" class="loading">Processing your request, this may take a moment...</div>
-        </div>
-        
-        <hr>
-        
-        <div id="errorMessage" class="error" style="display: none;"></div>
-        
-        <div id="responseArea">
-            {% if user_query %}
-                <div class="user"><strong>User:</strong> {{ user_query }}</div>
-            {% endif %}
-            
-            {% if response %}
-                <div class="bot"><strong>Bot:</strong> {{ response | safe }}</div>
-            {% endif %}
-        </div>
+    <h2>Test Form</h2>
+    
+    <div id="queryForm">
+        <input type="text" id="user_query" placeholder="Enter query:" style="width: 300px;" required />
+        <button type="button" id="submitBtn" onclick="submitQuery()">Submit</button>
+        <div id="loading" style="display: none;">Loading...</div>
     </div>
+    
+    <div id="responseArea" style="margin-top: 20px;"></div>
 
     <script>
         function submitQuery() {
             const query = document.getElementById('user_query').value.trim();
             const submitBtn = document.getElementById('submitBtn');
             const loadingIndicator = document.getElementById('loading');
-            const errorMessage = document.getElementById('errorMessage');
             const responseArea = document.getElementById('responseArea');
             
             if (!query) {
-                errorMessage.textContent = "Please enter a query";
-                errorMessage.style.display = "block";
+                alert("Please enter a query");
                 return;
             }
             
-            // Clear previous messages
-            errorMessage.style.display = "none";
-            
             // Show loading state
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Processing...';
             loadingIndicator.style.display = 'block';
             
             // Create request
@@ -70,41 +40,15 @@
             
             xhr.onload = function() {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Submit';
                 loadingIndicator.style.display = 'none';
                 
-                if (xhr.status === 200) {
-                    try {
-                        const result = JSON.parse(xhr.responseText);
-                        responseArea.innerHTML = `
-                            <div class="user"><strong>User:</strong> ${query}</div>
-                            <div class="bot"><strong>Bot:</strong> ${result.response}</div>
-                        `;
-                    } catch (e) {
-                        errorMessage.textContent = "Error parsing response";
-                        errorMessage.style.display = "block";
-                    }
-                } else {
-                    errorMessage.textContent = "Server error: " + xhr.status;
-                    errorMessage.style.display = "block";
-                }
+                responseArea.innerHTML = `Status: ${xhr.status}<br>Response: ${xhr.responseText}`;
             };
             
             xhr.onerror = function() {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Submit';
                 loadingIndicator.style.display = 'none';
-                errorMessage.textContent = "Request failed. Please check your network connection.";
-                errorMessage.style.display = "block";
-            };
-            
-            xhr.timeout = 120000; // 2 minutes timeout
-            xhr.ontimeout = function() {
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'Submit';
-                loadingIndicator.style.display = 'none';
-                errorMessage.textContent = "Request timed out. The server took too long to respond.";
-                errorMessage.style.display = "block";
+                responseArea.innerHTML = "Request failed";
             };
             
             // Send the request
