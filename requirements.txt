@@ -11,20 +11,18 @@ scikit-learn==1.4.2
 
 # FAISS for fast similarity search (CPU version)
 faiss-cpu
+
+# Transformers & sentence embeddings
 transformers==4.35.2
+sentence_transformers
+accelerate  # optional, remove if unused
 
-# Web apps / dashboarding
-streamlit
+# Web app (Flask)
+flask
+gunicorn
+python-dotenv
 
-# Visualization
+# Visualization (optional — keep only if you're using them in backend)
 matplotlib==3.8.4
 seaborn==0.13.2
 plotly==5.20.0
-
-# Embeddings and acceleration
-sentence_transformers
-accelerate
-flask
-python-dotenv
-
-gunicorn
