@@ -25,5 +25,6 @@ plotly==5.20.0
 sentence_transformers
 accelerate
 flask
+python-dotenv
 
 gunicorn
