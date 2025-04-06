@@ -115,11 +115,19 @@ def process_query():
         user_query = request.form.get("user_query", "").strip()
         print(f"Received query: {user_query}")
         
-        # Just echo back the query for testing
-        return jsonify({
-            "success": True,
-            "response": f"Received your query: {user_query}"
-        })
+        # Add back just the query analysis
+        try:
+            from agents.query_analysis import analyze_query_with_mistral
+            analysis = analyze_query_with_mistral(user_query)
+            return jsonify({
+                "success": True,
+                "response": f"Analysis complete: {analysis}"
+            })
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "response": f"Analysis failed: {str(e)}"
+            })
         
     except Exception as e:
         import traceback
