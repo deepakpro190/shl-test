@@ -24,6 +24,6 @@ plotly==5.20.0
 # Embeddings and acceleration
 sentence_transformers
 accelerate
-
+flask
 
 gunicorn
