@@ -121,7 +121,7 @@ def home():
             print(" An error occurred:", e)
             response = "Oops! Something went wrong. Please try again."
 
-    return render_template("index.html", response=response)
+    return render_template("index.html", response=response, user_query=user_query)
 
 '''
 from flask import Flask,render_template,request
