@@ -75,9 +75,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-# Setup Playwright (only once, ideally during deployment/setup)
-subprocess.call("playwright install", shell=True)
-subprocess.call("playwright install-deps", shell=True)
 
 app = Flask(__name__)
 
