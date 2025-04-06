@@ -57,7 +57,7 @@ def home():
                 print(f" Analysis result: {analysis}")
 
                 # Ensure Chrome is ready before calling any script that may use it
-                install_chrome_if_missing()
+                #install_chrome_if_missing()
 
                 if analysis["keywords"]:
                     print(f" Running first.py with keywords: {analysis['keywords']}")
