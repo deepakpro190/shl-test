@@ -11,3 +11,10 @@ libpangocairo-1.0-0
 libgtk-3-0
 libxss1
 libnss3-dev
+libnspr4
+libcups2
+libxfixes3
+libxkbcommon0
+libpango-1.0-0    
+libcairo2      
+libatspi2.0-0   
