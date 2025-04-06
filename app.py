@@ -104,6 +104,18 @@ def home():
     return render_template("index.html", response=response, user_query=user_query)
 '''
 from flask import Flask, request, render_template, jsonify
+import asyncio
+from playwright.sync_api import sync_playwright
+from playwright.__main__ import main as playwright_main
+import os
+
+# Install Playwright browsers if not already installed
+if not os.path.exists("/opt/render/.cache/ms-playwright"):
+    print("⏬ Installing Playwright browsers...")
+    try:
+        asyncio.run(playwright_main(["install", "--with-deps"]))
+    except Exception as e:
+        print("❌ Playwright install failed:", e)
 
 app = Flask(__name__)
 
