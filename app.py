@@ -82,7 +82,7 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 @app.route("/", methods=["GET", "POST"])
 def home():
     response = None
-
+    user_query=""
     if request.method == "POST":
         try:
             print(" Received POST request")
