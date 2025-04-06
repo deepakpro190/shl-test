@@ -26,3 +26,4 @@ sentence_transformers
 accelerate
 
 
+gunicorn
