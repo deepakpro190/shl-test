@@ -10,7 +10,7 @@ pandas==2.2.2
 scikit-learn==1.4.2
 
 # FAISS for fast similarity search (CPU version)
-faiss
+faiss-cpu
 transformers==4.35.2
 
 # Web apps / dashboarding
