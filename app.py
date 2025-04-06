@@ -64,30 +64,24 @@ if st.button("🚀 Submit Query"):
 
         st.write(response)
         st.session_state.user_query = ""
-
-from flask import Flask, request, render_template, session, redirect, url_for
+'''
+from flask import Flask, request, render_template
 from utils.faiss_utils import store_results_to_faiss, query_faiss
 from agents.query_analysis import analyze_query_with_mistral
 from utils.response_generator import generate_response
-import subprocess
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
-
-
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
-
-# Assuming MISTRAL_API_KEY is in env vars or a .env file
+# Load API key from .env
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @app.route("/", methods=["GET", "POST"])
-
 def home():
-    if "chat_history" not in session:
-        session["chat_history"] = []
+    response = None
 
     if request.method == "POST":
         user_query = request.form.get("user_query", "").strip()
@@ -96,7 +90,7 @@ def home():
             # Step 1: Analyze query
             analysis = analyze_query_with_mistral(user_query)
 
-            # Step 2: Run scripts
+            # Step 2: Run scripts based on analysis
             if analysis["keywords"]:
                 os.system(f"python scripts/first.py {' '.join(analysis['keywords'])}")
 
@@ -106,20 +100,14 @@ def home():
             if analysis["job_category"]:
                 os.system(f"python scripts/third.py --category '{analysis['job_category']}'")
 
-            # Step 3: Store results to FAISS
+            # Step 3: Store and query FAISS
             store_results_to_faiss()
-
-            # Step 4: Query FAISS
             results = query_faiss(user_query)
 
-            # Step 5: Generate response
+            # Step 4: Generate response
             response = generate_response(user_query, results)
 
-            # Update session chat
-            session["chat_history"].append({"user": user_query, "bot": response})
-            session.modified = True
-
-    return render_template("index.html", chat_history=session["chat_history"])
+    return render_template("index.html", response=response)
 '''
 from flask import Flask,render_template,request
 
@@ -142,3 +130,4 @@ def marks():
 
 if __name__=='__main__':
     app.run(debug=True)
+'''
