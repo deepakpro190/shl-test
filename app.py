@@ -108,8 +108,8 @@ import os
 import subprocess
 import traceback
 import requests
-from faiss_utils import store_results_to_faiss, query_faiss
-from response_generator import generate_response
+from utils.faiss_utils import store_results_to_faiss, query_faiss
+from utils.response_generator import generate_response
 
 # Optional: Install Playwright browsers only if needed
 if not os.path.exists("/opt/render/.cache/ms-playwright"):
