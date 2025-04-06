@@ -101,27 +101,31 @@ def home():
 
     return render_template("index.html", response=response, user_query=user_query)
 '''
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("direct-form.html")
+    return render_template("index.html")
 
-@app.route("/direct_process", methods=["POST"])
-def direct_process():
+@app.route("/process_query", methods=["POST"])
+def process_query():
     try:
         user_query = request.form.get("user_query", "").strip()
-        print(f"Received query via direct form: {user_query}")
+        print(f"Received query: {user_query}")
         
         # Just echo back the query for testing
-        response = f"Received your query: {user_query}"
-        
-        return render_template("direct-form.html", response=response)
+        return jsonify({
+            "success": True,
+            "response": f"Received your query: {user_query}"
+        })
         
     except Exception as e:
         import traceback
         print(f"Error: {str(e)}")
         print(traceback.format_exc())
-        return render_template("direct-form.html", response=f"Error: {str(e)}")
+        return jsonify({
+            "success": False, 
+            "response": f"Error: {str(e)}"
+        })
