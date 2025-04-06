@@ -84,8 +84,6 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @app.route("/", methods=["GET", "POST"])
-def run():
-    return render_template('index.html')
 
 def home():
     if "chat_history" not in session:
@@ -123,5 +121,4 @@ def home():
 
     return render_template("index.html", chat_history=session["chat_history"])
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=config.DEBUG)
