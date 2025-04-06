@@ -1,5 +1,6 @@
 # Web scraping
-playwright
+selenium
+webdriver-manager
 
 # Data manipulation
 numpy==1.26.4
@@ -19,6 +20,9 @@ streamlit==1.33.0
 matplotlib==3.8.4
 seaborn==0.13.2
 plotly==5.20.0
+
+# Embeddings and acceleration
 sentence_transformers
 accelerate
+
 -e .
