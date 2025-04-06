@@ -94,6 +94,7 @@ with sync_playwright() as p:
 
     print(f"✅ Scraping finished. {len(jobs)} jobs saved to results2025.csv")
 '''
+'''
 import argparse
 import csv
 import os
@@ -184,6 +185,127 @@ with sync_playwright() as p:
             break
 
     browser.close()
+
+# ✅ Save to CSV
+with open(args.output, 'w', newline='', encoding='utf-8') as f:
+    writer = csv.DictWriter(f, fieldnames=['Job Title', 'Link', 'Remote Testing', 'Adaptive/IRT', 'Keys'])
+    writer.writeheader()
+    writer.writerows(jobs)
+
+print(f"✅ Done. {len(jobs)} records saved to {args.output}")
+'''
+
+import argparse
+import csv
+import os
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+
+# ✅ Helper to select an item from dropdowns if value is provided
+def select_dropdown(driver, dropdown_holder_id, option_text):
+    if not option_text:
+        return
+
+    dropdown_trigger = driver.find_element(By.CSS_SELECTOR, f"#{dropdown_holder_id} .choices")
+    dropdown_trigger.click()
+
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, f"#{dropdown_holder_id} .choices__list--dropdown"))
+    )
+
+    options = driver.find_elements(By.CSS_SELECTOR, f'#{dropdown_holder_id} .choices__item--selectable')
+    for option in options:
+        if option.text.strip().lower() == option_text.strip().lower():
+            option.click()
+            return
+
+# ✅ CLI Argument Parser
+parser = argparse.ArgumentParser(description="SHL Catalog Scraper with Filters")
+parser.add_argument("--job_family", help="Job Family filter (e.g. Safety)")
+parser.add_argument("--job_level", help="Job Level filter")
+parser.add_argument("--industry", help="Industry filter")
+parser.add_argument("--language", help="Language filter")
+parser.add_argument("--output", default="data/second.csv", help="CSV file path to save results")
+args = parser.parse_args()
+
+# ✅ Ensure output folder exists
+os.makedirs(os.path.dirname(args.output), exist_ok=True)
+
+jobs = []
+
+# ✅ Setup Selenium
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+driver.get("https://www.shl.com/solutions/products/product-catalog/")
+
+# ✅ Apply filters
+select_dropdown(driver, "Form_FilteringForm_job_family_Holder", args.job_family)
+select_dropdown(driver, "Form_FilteringForm_job_level_Holder", args.job_level)
+select_dropdown(driver, "Form_FilteringForm_industry_Holder", args.industry)
+select_dropdown(driver, "Form_FilteringForm_language_Holder", args.language)
+
+driver.find_element(By.ID, "Form_FilteringForm_action_doFilteringForm").click()
+time.sleep(2)
+
+# 🔁 Pagination loop
+while True:
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.js-target-table-wrapper table tbody tr'))
+    )
+    rows = driver.find_elements(By.CSS_SELECTOR, 'table tbody tr')
+
+    for row in rows:
+        try:
+            title_el = row.find_element(By.CSS_SELECTOR, 'td a')
+            title = title_el.text.strip()
+            link = title_el.get_attribute('href')
+        except:
+            title, link = '', ''
+
+        cells = row.find_elements(By.CSS_SELECTOR, 'td')
+        remote_td = cells[1] if len(cells) > 1 else None
+        adaptive_td = cells[2] if len(cells) > 2 else None
+
+        remote = 'Yes' if remote_td and remote_td.find_elements(By.CSS_SELECTOR, 'span.catalogue__circle.-yes') else 'No'
+        adaptive = 'Yes' if adaptive_td and adaptive_td.find_elements(By.CSS_SELECTOR, 'span.catalogue__circle.-yes') else 'No'
+
+        key_spans = row.find_elements(By.CSS_SELECTOR, 'span.product-catalogue__key')
+        keys = ', '.join([span.text.strip() for span in key_spans])
+
+        jobs.append({
+            'Job Title': title,
+            'Link': link,
+            'Remote Testing': remote,
+            'Adaptive/IRT': adaptive,
+            'Keys': keys
+        })
+
+    # ✅ Pagination handling
+    try:
+        next_btn = driver.find_element(By.CSS_SELECTOR, 'li.-arrow.-next a.pagination__arrow')
+        next_href = next_btn.get_attribute('href')
+        if next_href:
+            next_url = "https://www.shl.com" + next_href
+            print(f"➡️ Going to next page: {next_url}")
+            driver.get(next_url)
+            time.sleep(2)
+        else:
+            break
+    except:
+        print("✅ Reached last page.")
+        break
+
+driver.quit()
 
 # ✅ Save to CSV
 with open(args.output, 'w', newline='', encoding='utf-8') as f:
