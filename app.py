@@ -64,7 +64,7 @@ if st.button("🚀 Submit Query"):
 
         st.write(response)
         st.session_state.user_query = ""
-'''
+
 from flask import Flask, request, render_template, session, redirect, url_for
 from utils.faiss_utils import store_results_to_faiss, query_faiss
 from agents.query_analysis import analyze_query_with_mistral
@@ -120,3 +120,25 @@ def home():
             session.modified = True
 
     return render_template("index.html", chat_history=session["chat_history"])
+'''
+from flask import Flask,render_template,request
+
+app = Flask(__name__)
+
+@app.route('/')
+def run():
+    return render_template('home.html')
+
+@app.route('/submit', methods=['POST'])
+def marks():
+    Physics=int(request.form['Physics'])
+    Maths= int(request.form['Maths'])
+    Chemistry = int(request.form['Chemistry'])
+    Hindi = int(request.form['Hindi'])
+    English = int(request.form['English'])
+    result = Physics + Maths + Chemistry + Hindi + English
+    Percentage = result/5
+    return render_template('home.html',Percentage=Percentage)
+
+if __name__=='__main__':
+    app.run(debug=True)
