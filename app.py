@@ -73,6 +73,8 @@ def home():
                         "--language", analysis["language"]
                     ], check=True)
 
+            
+               
                 if analysis["job_category"]:
                     print(" Running third.py with category...")
                     subprocess.run([
@@ -132,6 +134,21 @@ def process_query():
                 "success": True,
                 "response": f"Analysis and first script complete"
             })
+            if any([analysis["job_family"], analysis["job_level"], analysis["industry"], analysis["language"]]):
+                    print(" Running second.py with job details...")
+                    subprocess.run([
+                        "python", "scripts/second.py",
+                        "--family", analysis["job_family"],
+                        "--level", analysis["job_level"],
+                        "--industry", analysis["industry"],
+                        "--language", analysis["language"]
+                    ], check=True)
+
+            
+            return jsonify({
+                    "success": True,
+                    "response": f"Analysis and second script complete"
+                })
         except Exception as e:
             return jsonify({
                 "success": False,
