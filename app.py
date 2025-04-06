@@ -6,10 +6,8 @@ from utils.response_generator import generate_response
 import os
 import subprocess
 
-# Install Playwright browser if not already installed
-if not os.path.exists(os.path.expanduser("~/.cache/ms-playwright")):
-    subprocess.run(["playwright", "install", "chromium"], check=True)
-
+os.system('playwright install')
+os.system('playwright install-deps')
 MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
 st.set_page_config(page_title="🧠 SHL Assessment Recommender", layout="wide")
