@@ -81,7 +81,7 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    response = None
+    '''response = None
     user_query=""
     print("HELOO WORLD")
     if request.method == "POST":
@@ -122,7 +122,8 @@ def home():
             print(" An error occurred:", e)
             response = "Oops! Something went wrong. Please try again."
 
-    return render_template("index.html", response=response, user_query=user_query)
+    return render_template("index.html", response=response, user_query=user_query)'''
+    return "<h1>It works!</h1>"
 
 '''
 from flask import Flask,render_template,request
