@@ -108,6 +108,7 @@ import asyncio
 from playwright.sync_api import sync_playwright
 from playwright.__main__ import main as playwright_main
 import os
+import requests
 
 # Install Playwright browsers if not already installed
 if not os.path.exists("/opt/render/.cache/ms-playwright"):
