@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,10 +18,12 @@
             <button type="submit">🚀 Submit</button>
         </form>
         <hr>
-        {% for chat in chat_history %}
-            <div class="user"><strong>User:</strong> {{ chat.user }}</div>
-            <div class="bot"><strong>Bot:</strong> {{ chat.bot | safe }}</div>
-        {% endfor %}
+        {% if user_query %}
+            <div class="user"><strong>User:</strong> {{ user_query }}</div>
+        {% endif %}
+        {% if response %}
+            <div class="bot"><strong>Bot:</strong> {{ response | safe }}</div>
+        {% endif %}
     </div>
 </body>
 </html>
