@@ -95,6 +95,8 @@ def home():
             print(" An error occurred:", e)
             response = "Oops! Something went wrong. Please try again."
     else:
+        print(f"Method is: {request.method}")
+
         print("SOMETHING HAPPENDED , DONT KNOW")
 
     return render_template("index.html", response=response, user_query=user_query)
