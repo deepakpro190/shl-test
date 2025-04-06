@@ -113,7 +113,8 @@ import os
 if not os.path.exists("/opt/render/.cache/ms-playwright"):
     print("⏬ Installing Playwright browsers...")
     try:
-         os.system("playwright install --with-deps")
+         # With this simpler and more reliable command:
+        os.system("playwright install chromium")
     except Exception as e:
         print("❌ Playwright install failed:", e)
 
