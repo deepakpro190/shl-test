@@ -27,7 +27,7 @@ COPY . .
 RUN pip install playwright && playwright install chromium
 
 # Expose port
-EXPOSE 8000
+EXPOSE 10000
 
 # Default command
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
