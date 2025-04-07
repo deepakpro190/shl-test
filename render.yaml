@@ -4,5 +4,4 @@ services:
     env: docker
     plan: free
     branch: main
-    buildCommand: ""
-    startCommand: gunicorn app:app --bind 0.0.0.0:8000
+    autoDeploy: true
