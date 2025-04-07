@@ -26,5 +26,4 @@ COPY . .
 # Install Playwright and its browsers
 RUN pip install chromium
 
-# Default command
-CMD gunicorn --bind 0.0.0.0:${PORT} app:app
+
