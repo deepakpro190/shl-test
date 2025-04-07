@@ -1,1 +1,8 @@
-apt-get update && apt-get install -y wget unzip xvfb libxi6 libgconf-2-4 libappindicator1 libindicator7 libu2f-udev chromium chromium-driver
+services:
+  - type: web
+    name: shl-app
+    env: docker
+    plan: free
+    branch: main
+    buildCommand: ""
+    startCommand: gunicorn app:app --bind 0.0.0.0:8000
