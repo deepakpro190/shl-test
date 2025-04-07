@@ -24,10 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Install Playwright and its browsers
-RUN pip install playwright && playwright install chromium
-
-# Expose port
-EXPOSE 10000
+RUN pip install chromium
 
 # Default command
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+CMD gunicorn --bind 0.0.0.0:${PORT} app:app
