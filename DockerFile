@@ -26,6 +26,4 @@ COPY . .
 # Install Playwright and its browsers
 RUN pip install chromium
 
-EXPOSE 10000
-
-CMD ["python", "app.py"]  # or your main script name
+CMD gunicorn --bind 0.0.0.0:${PORT} app:app
