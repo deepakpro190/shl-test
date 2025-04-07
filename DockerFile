@@ -26,4 +26,6 @@ COPY . .
 # Install Playwright and its browsers
 RUN pip install chromium
 
+EXPOSE 10000
 
+CMD ["python", "app.py"]  # or your main script name
